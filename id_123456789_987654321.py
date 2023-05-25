@@ -16,7 +16,8 @@ class Planner:
         self.num_users = num_users
         self.arms_thresh = arms_thresh
         self.user_distribution = users_distribution
-        self.num_features = 4
+        self.num_features = 20
+
         self.model = LinUCB(self.num_arms, self.num_features)
 
         self.curr_round = 0

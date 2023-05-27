@@ -1,7 +1,16 @@
 import numpy as np
 
+a = np.array([[0.49999633, 0.19999772],
+ [0.39998158, 0.69999138]])
+
+print(a)
+print(a + 0.0001)
+
+b = (a + 0.0001) - a
+print(np.linalg.norm(a))
+
 class LinUCB:
-    def __init__(self, num_actions, num_features, alpha=1.0):
+    def __init__(self, num_actions, num_features, alpha=0.0001):
         self.num_actions = num_actions
         self.num_features = num_features
         self.alpha = alpha
@@ -20,7 +29,10 @@ class LinUCB:
             x = np.atleast_2d(context).T  # Reshape the context as a column vector
             p[a] = np.dot(theta.T, x) + self.alpha * np.sqrt(np.dot(np.dot(x.T, A_inv), x))
 
+
+        p += (np.random.random(len(p)) * 0.000001)
         # Choose the action with the highest UCB
+        #print(p)
         chosen_action = np.argmax(p)
         return chosen_action
 

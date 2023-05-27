@@ -55,6 +55,9 @@ class MABSimulation:
         """
         for arm in range(self.num_arms):
             if self.exposure_list[arm] < self.arms_thresh[arm]:
+                print("------------------")
+                print(self.exposure_list[arm])
+                print(self.arms_thresh[arm])
                 if arm not in self.inactive_arms: print("\n arm " + str(arm) + " is deactivated!")
                 self.inactive_arms.add(arm)
         self.exposure_list = np.zeros(self.num_arms)  # initiate the exposure list for the next phase.
@@ -159,7 +162,7 @@ def run_simulation(simulation_num):
 
 
 def main():
-    reward = run_simulation(0)
+    reward = run_simulation(1)
     print("The total reward of your planner is " + str(reward))
 
 

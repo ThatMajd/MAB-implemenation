@@ -55,9 +55,6 @@ class MABSimulation:
         """
         for arm in range(self.num_arms):
             if self.exposure_list[arm] < self.arms_thresh[arm]:
-                print("------------------")
-                print(self.exposure_list[arm])
-                print(self.arms_thresh[arm])
                 if arm not in self.inactive_arms: print("\n arm " + str(arm) + " is deactivated!")
                 self.inactive_arms.add(arm)
         self.exposure_list = np.zeros(self.num_arms)  # initiate the exposure list for the next phase.
@@ -139,6 +136,15 @@ def get_simulation_params(simulation_num):
             'arms_thresh': np.array([0, 0.4, 0.4]) * PHASE_LEN,
             'ERM': np.array([[0.5, 0, 0], [0, (1 + (4 * (NUM_ROUNDS ** (-1 / 3)))) / 2, 1 / 2]])
         },
+        {
+            'num_rounds': NUM_ROUNDS,
+            'phase_len': PHASE_LEN,
+            'num_arms': 2,
+            'num_users': 2,
+            'users_distribution': np.array([0.6, 0.4]),
+            'arms_thresh': np.array([0, 0.4]) * PHASE_LEN,
+            'ERM': np.array([[0.5, 0], [0, (1 + (4 * (NUM_ROUNDS ** (-1 / 3)))) / 2]])
+        }
     ]
     return simulations[simulation_num]
 
@@ -151,8 +157,7 @@ def run_simulation(simulation_num):
     params = get_simulation_params(simulation_num)
 
     mab = MABSimulation(**params)
-
-    planner = Planner(params['num_rounds'], params['phase_len'], params['num_arms'], params['num_users'],
+    planner = Planner(params["num_rounds"], params['phase_len'], params['num_arms'], params['num_users'],
                       params['arms_thresh'], params['users_distribution'])
 
     print('planner ' + planner.get_id() + ' is currently running')
@@ -162,8 +167,16 @@ def run_simulation(simulation_num):
 
 
 def main():
-    reward = run_simulation(1)
-    print("The total reward of your planner is " + str(reward))
+    # print("Before:")
+    # reward = run_simulation(4)
+    # print("The total reward of your planner is " + str(reward))
+    # print("After:")
+    # reward = run_simulation(5)
+    # print("The total reward of your planner is " + str(reward))
+    # return
+    for i in range(5):
+        reward = run_simulation(i)
+        print("The total reward of your planner is " + str(reward))
 
 
 if __name__ == '__main__':

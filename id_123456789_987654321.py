@@ -3,6 +3,9 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 
+# TODO DELTE THIS
+from fake_sim import FakeSimulation
+
 import time
 
 EXPLORE = "explore"
@@ -34,8 +37,8 @@ class Planner:
         self.norms = []
         self.converged = False
 
-        self.mode = EXPLORE
-        
+        #self.arms_thresh[0] = 0
+
     def reset_keep_alive(self):
         self.keep_alive = np.copy(self.arms_thresh)
         self.arm_pulled = np.zeros(self.num_arms, int)
@@ -48,6 +51,7 @@ class Planner:
         self.curr_round += 1
         i = self.curr_round
         self.user_selection[i] = user_context
+
         # print()
         # print("round: ", i)
         # print("Arms pulled: ", self.arm_pulled)
@@ -87,8 +91,39 @@ class Planner:
         self.content_ratings[user, arm] += reward
         self.dist_max[user, arm] = np.maximum(self.dist_max[user, arm], reward)
 
+        self.norms.append(np.linalg.norm(self.dist_max))
+
+        if not self.converged and (i % 2_000):
+            # Check every 2000 rounds whether we have converged
+            self.converged = self.check_convergence(self.norms, 200, 0.0001)
+
+        # if i == 999_999:
+        #     plt.hist(self.arm_selection)
+        #     plt.show()
+        # if i == self.num_rounds - 1:
+        #     print()
+        #     print(self.dist_max)
+        #     print(self.content_ratings)
+
+        # if i == 50000:
+        #     print()
+        #     print(np.sum(self.content_ratings, axis=0))
+        #     raise ZeroDivisionError
+
         if (self.curr_round + 1) % self.phase_len == 0:
             self.reset_keep_alive()
+
+    def check_convergence(self, array, window_size, threshold, plot=False):
+        moving_avg = np.convolve(array, np.ones(window_size) / window_size, mode='valid')
+        #plt.plot(array)
+        if plot:
+            plt.plot(moving_avg)
+            plt.xlabel('Iteration')
+            plt.ylabel('Moving Average')
+            plt.show()
+
+        diff = np.diff(moving_avg)
+        return diff[-1] < threshold
 
     def get_id(self):
         # TODO: Make sure this function returns your ID, which is the name of this file!

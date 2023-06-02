@@ -2,6 +2,7 @@ import numpy as np
 import time
 from tqdm import tqdm
 
+#test
 class FakeSimulation:
     def __init__(self, num_rounds, phase_len, num_arms, num_users, arms_thresh, users_distribution, ERM):
         """

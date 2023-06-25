@@ -1,7 +1,8 @@
 import numpy as np
 from tqdm import tqdm
 import time
-from id_123456789_987654321 import Planner
+import copy
+from id_206528382_323958140 import Planner
 
 NUM_ROUNDS = 10 ** 6
 PHASE_LEN = 10 ** 2
@@ -30,6 +31,7 @@ class MABSimulation:
         self.exposure_list = np.zeros(self.num_arms)
         # exposure_list[i] represents the number of exposures arm i has gotten in the current phase
         self.inactive_arms = set()  # set of arms that left the system
+        self.identity_array = np.arange(self.num_arms)
 
     def sample_user(self):
         """
@@ -43,14 +45,15 @@ class MABSimulation:
                 chosen_arm - the content provider that was recommended to the user
         :output: the sampled reward
         """
-        if chosen_arm >= self.num_arms or chosen_arm in self.inactive_arms:
+        id_chosen_arm = self.identity_array[chosen_arm]
+        if id_chosen_arm in self.inactive_arms:
             return 0
         else:
-            return np.random.uniform(0, 2 * self.ERM[sampled_user][chosen_arm])
+            return np.random.uniform(0, 2 * self.ERM[sampled_user][id_chosen_arm])
 
     def deactivate_arms(self):
         """
-        this function is called at the end of each phase and deactivates arms that haven't gotten enough exposure
+        this function is called at the end of each phase and deactivates arms that havn't gotten enough exposure
         (deactivated arm == arm that has departed)
         """
         for arm in range(self.num_arms):
@@ -77,7 +80,6 @@ class MABSimulation:
             if (i + 1) % self.phase_len == 0 and with_deactivation:  # satisfied only when it is the end of the phase
                 self.deactivate_arms()
 
-        print("run took: ", time.time() - begin_time, TIME_CAP)
         if time.time() - begin_time > TIME_CAP:
             print("the planner operation is too slow")
             return 0
@@ -91,6 +93,7 @@ def get_simulation_params(simulation_num):
     :output: the simulation parameters
     """
     simulations = [
+
         {
             'num_rounds': NUM_ROUNDS,
             'phase_len': PHASE_LEN,
@@ -140,10 +143,29 @@ def get_simulation_params(simulation_num):
             'num_rounds': NUM_ROUNDS,
             'phase_len': PHASE_LEN,
             'num_arms': 2,
-            'num_users': 2,
-            'users_distribution': np.array([0.6, 0.4]),
-            'arms_thresh': np.array([0, 0.4]) * PHASE_LEN,
-            'ERM': np.array([[0.5, 0], [0, (1 + (4 * (NUM_ROUNDS ** (-1 / 3)))) / 2]])
+            'num_users': 6,
+            'users_distribution': np.array([0.6, 0.1, 0, 0.1, 0.2, 0]),
+            'arms_thresh': np.array([0.3, 0.7]) * PHASE_LEN,
+            'ERM': np.array([[0.9, 0.1],
+                             [0.3, 0.7],
+                             [0.5, 0.5],
+                             [0.2, 0.8],
+                             [0.6, 0.4],
+                             [0.4, 0.6]])
+        },
+        {
+            'num_rounds': NUM_ROUNDS,
+            'phase_len': PHASE_LEN,
+            'num_arms': 4,
+            'num_users': 6,
+            'users_distribution': np.array([0.2, 0.1, 0.3, 0.15, 0.15, 0.1]),
+            'arms_thresh': np.array([0.25, 0.5, 0.75, 1.0]) * PHASE_LEN,
+            'ERM': np.array([[0.4, 0.2, 0.3, 0.1],
+                             [0.1, 0.3, 0.4, 0.2],
+                             [0.3, 0.1, 0.2, 0.4],
+                             [0.2, 0.4, 0.1, 0.3],
+                             [0.4, 0.3, 0.2, 0.1],
+                             [0.2, 0.1, 0.4, 0.3]])
         }
     ]
     return simulations[simulation_num]
@@ -155,10 +177,11 @@ def run_simulation(simulation_num):
     :output: the reward of the students' planners for the given simulation
     """
     params = get_simulation_params(simulation_num)
-
+    planner_params = copy.deepcopy(params)
     mab = MABSimulation(**params)
-    planner = Planner(params["num_rounds"], params['phase_len'], params['num_arms'], params['num_users'],
-                      params['arms_thresh'], params['users_distribution'])
+
+    planner = Planner(planner_params['num_rounds'], planner_params['phase_len'], planner_params['num_arms'], planner_params['num_users'],
+                      planner_params['arms_thresh'], planner_params['users_distribution'])
 
     print('planner ' + planner.get_id() + ' is currently running')
     reward = mab.simulation(planner)
@@ -167,16 +190,11 @@ def run_simulation(simulation_num):
 
 
 def main():
-    # print("Before:")
-    # reward = run_simulation(4)
-    # print("The total reward of your planner is " + str(reward))
-    # print("After:")
-    # reward = run_simulation(5)
-    # print("The total reward of your planner is " + str(reward))
-    # return
-    for i in range(5):
-        reward = run_simulation(i)
-        print("The total reward of your planner is " + str(reward))
+    reward = run_simulation(-1)
+    print("The total reward of your planner is " + str(reward))
+    # for i in range(5):
+    #     reward = run_simulation(i)
+    #     print("\nThe total reward of your planner is " + str(reward))
 
 
 if __name__ == '__main__':

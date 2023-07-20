@@ -20,7 +20,7 @@ The following Python libraries are required to run the code:
 The repository includes 3 files:
 - [model.py](https://github.com/ThatMajd/MAB-implemenation/blob/main/model.py) - The code for the model
 - [simulation.py](https://github.com/ThatMajd/MAB-implemenation/blob/main/simulation.py) - the enviorment that the model runs in.
-- [report](https://github.com/ThatMajd/MAB-implemenation/blob/main/report) - A report detaling how the model works .
+- [report](https://github.com/ThatMajd/MAB-implemenation/blob/main/206528382_323958140.pdf) - A report detaling how the model works .
 
 ## Basic Walkthrough
 The model can be broken to 2 stages:
